@@ -1,12 +1,10 @@
 package main
 
-/*
-#cgo CFLAGS : -I../include
-#cgo LDFLAGS: -L../lib -ltest
-#include "test.h"
-*/
-import "C"
+import (
+	"github.com/JodeZer/opensift_gowrapper"
+)
 
 func main() {
-	C.test()
+	sift.Match(&sift.ImageEntity{"img/test.jpeg", "003"}, &sift.ImageEntity{"img/beaver_xform.png", "002"})
+	sift.Match(&sift.ImageEntity{"../img/test.jpeg", "004"}, &sift.ImageEntity{"img/beaver_xform.png", "002"})
 }
