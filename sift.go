@@ -308,8 +308,8 @@ var DEFAULT_ON_EVICTED func(interface{}, interface{}) = func(key, value interfac
 }
 
 type SiftClientOption struct {
-	Kdtree_bbf_max_nn_chks int
-	Nn_sq_dist_ratio_thr   float32
+	Kdtree_bbf_max_nn_chks int  //not used
+	Nn_sq_dist_ratio_thr   float32 //not used
 	Tf                     thresholdFunc
 	CacheSize              int //TODO
 }
