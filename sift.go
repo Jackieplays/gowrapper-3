@@ -42,16 +42,23 @@ int compare_features(struct feature* f0, int count0,struct feature* f1,int count
 	kdtree_release( kd_root );
 	return num_matches;
 }
+
+int getlplImageSize(IplImage* img) {
+	if(!img) return 0;
+	return img->imageSize;
+}
+
 */
 import "C"
 import (
 	"fmt"
 	"unsafe"
 	"sync"
+	"github.com/pkg/errors"
 )
 
 /*
-the impl
+the test impl
 */
 func MatchImpl(path1, path2 string) (int, int, int) {
 	var features, features2 *C.struct_feature
@@ -115,6 +122,13 @@ func cvLoadImg(path string) *img_t {
 	}
 }
 
+func getImageSize(img *img_t) int {
+	if img == nil {
+		return 0
+	}
+	return int(C.getlplImageSize(img.Img))
+}
+
 func freeImg(img *img_t) {
 	C.cvReleaseImage(&(img.Img))
 }
@@ -131,6 +145,10 @@ func sift_features(img *img_t) *featureData {
 }
 
 func free_featureData(featData *featureData) {
+	/**
+	the C.Feat.feature_data has been freed during function sift_features,
+	here may just need to free the non-pointer memory in this pointer
+	 */
 	C.free(unsafe.Pointer(featData.Feature.Feat))
 }
 
@@ -197,32 +215,49 @@ type siftClient struct {
 	lruMutex               *sync.RWMutex
 }
 
-func (c *siftClient)Load(ie *ImageEntity) error {
+/**
+preload cache
+ */
+func (c *siftClient)Load(ie *ImageEntity) (err error) {
+	defer func() {
+		if e := recover(); e != nil {
+			err = errors.New(e.(string))
+		}
+	}()
+	feature := loadFeatureData(ie)
+	c.setCache(ie, feature)
 	return nil
 }
 
+/*
+TODO there is  a panic ,catch it?
+*/
 func (c *siftClient)Match(ie1 *ImageEntity, ie2 *ImageEntity) bool {
 
 	var features1, features2 *featureData
 	var ok1, ok2 bool
 	var wg *sync.WaitGroup = new(sync.WaitGroup)
+	/*
+	if many coroutine come into this place and check the cache,they all don't get it.
+	and they all load the real data,lt's not friend to concurrency.
+	TODO design a flag for spin lock,the after coroutine wait and retry until done?
+	TODO how to deal with a dead lock when exception?
+	*/
 	features1, ok1 = c.getCache(ie1)
 	features2, ok2 = c.getCache(ie2)
 	if !ok1 {
 		wg.Add(1)
-		go func(){
+		go func() {
 			features1 = loadFeatureData(ie1)
 			c.setCache(ie1, features1)
 			wg.Done()
-		}() // this a time cost operation,could be
-
-
+		}()
 
 	}
 
 	if !ok2 {
 		wg.Add(1)
-		go func(){
+		go func() {
 			features2 = loadFeatureData(ie2)
 			c.setCache(ie2, features2)
 			wg.Done()
@@ -266,8 +301,8 @@ var DEFAULT_SIFT_OPTION SiftClientOption = SiftClientOption{
 
 var DEFAULT_SIFT_CLIENT Client = NewSiftClient(&DEFAULT_SIFT_OPTION)
 
-var DEFAULT_ON_EVICTED func(interface{},interface{}) = func (key,value interface{}) {
-	fmt.Println("on evicted")
+var DEFAULT_ON_EVICTED func(interface{}, interface{}) = func(key, value interface{}) {
+	fmt.Printf("on evicted %+v\n", key)
 	featData := value.(*featureData)
 	free_featureData(featData)
 }
