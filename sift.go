@@ -157,9 +157,12 @@ func loadFeatureData(ie *ImageEntity) *featureData {
 	if img.Img == nil {
 		panic(fmt.Sprintf("can't load image path %s", ie.FilePath))
 	}
+	defer freeImg(img)
 	featData := sift_features(img)
+	if featData.Feature.Feat == nil {
+		panic(fmt.Sprintf("can't load image feature %s", ie.FilePath))
+	}
 	featData.ImageEntity = *ie
-	freeImg(img)
 	return featData
 }
 
