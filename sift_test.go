@@ -61,33 +61,46 @@ func TestLoad(t *testing.T) {
 	c := NewSiftClient(&SiftClientOption{
 		CacheSize: 200,
 	})
-	timeCostWrapper("img/beaver.png laod", func() {
-		c.Load(&ImageEntity{"img/beaver.png", "001"})
-	})
-	timeCostWrapper("img/beaver_xform.png load", func() {
-		c.Load(&ImageEntity{"img/beaver_xform.png", "002"})
-	})
-	timeCostWrapper("panic load", func() {
-		c.Load(&ImageEntity{"beaver_xform.png", "002"})
-	})
-	timeCostWrapper("img/jianpan_a.jpeg load", func() {
-		c.Load(&ImageEntity{"img/jianpan_a.jpeg", "003"})
-	})
-	timeCostWrapper("cache macth", func() {
-		c.Match(&ImageEntity{"img/beaver.png", "001"}, &ImageEntity{"img/beaver_xform.png", "002"})
+	//timeCostWrapper("img/beaver.png laod", func() {
+	//	c.Load(&ImageEntity{"img/beaver.png", "001"})
+	//})
+	//timeCostWrapper("img/beaver_xform.png load", func() {
+	//	c.Load(&ImageEntity{"img/beaver_xform.png", "002"})
+	//})
+	//timeCostWrapper("panic load", func() {
+	//	c.Load(&ImageEntity{"beaver_xform.png", "002"})
+	//})
+	//timeCostWrapper("img/jianpan_a.jpeg load", func() {
+	//	c.Load(&ImageEntity{"img/jianpan_a.jpeg", "003"})
+	//})
+	//timeCostWrapper("cache macth", func() {
+	//	c.Match(&ImageEntity{"img/beaver.png", "001"}, &ImageEntity{"img/beaver_xform.png", "002"})
+	//})
+	//
+	//timeCostWrapper("half cache macth", func() {
+	//	c.Match(&ImageEntity{"img/jianpan_a.jpeg", "003"}, &ImageEntity{"img/jianpan_b.jpeg", "004"})
+	//})
+	//
+	//timeCostWrapper("full cache macth", func() {
+	//	c.Match(&ImageEntity{"img/jianpan_a.jpeg", "003"}, &ImageEntity{"img/jianpan_b.jpeg", "004"})
+	//})
+	//
+	//timeCostWrapper("null cache macth", func() {
+	//	c.Match(&ImageEntity{"img/jianpan_a.jpeg", "103"}, &ImageEntity{"img/jianpan_b.jpeg", "104"})
+	//})
+
+	timeCostWrapper("size  macth", func() {
+		c.Match(&ImageEntity{"img/jianpan_a1.jpeg", "img/jianpan_a1.jpeg"}, &ImageEntity{"img/jianpan_b1.jpeg", "img/jianpan_b1.jpeg"})
 	})
 
-	timeCostWrapper("half cache macth", func() {
-		c.Match(&ImageEntity{"img/jianpan_a.jpeg", "003"}, &ImageEntity{"img/jianpan_b.jpeg", "004"})
+	timeCostWrapper("size  macth2", func() {
+		c.Match(&ImageEntity{"img/jianpan_a.jpeg", "img/jianpan_a.jpeg"}, &ImageEntity{"img/jianpan_b.jpeg", "img/jianpan_b.jpeg"})
 	})
 
-	timeCostWrapper("full cache macth", func() {
-		c.Match(&ImageEntity{"img/jianpan_a.jpeg", "003"}, &ImageEntity{"img/jianpan_b.jpeg", "004"})
+	timeCostWrapper("size  macth3", func() {
+		c.Match(&ImageEntity{"img/jianpan_a.jpeg", "img/jianpan_a11.jpeg"}, &ImageEntity{"img/jianpan_b1.jpeg", "img/jianpan_111b.jpeg"})
 	})
 
-	timeCostWrapper("null cache macth", func() {
-		c.Match(&ImageEntity{"img/jianpan_a.jpeg", "103"}, &ImageEntity{"img/jianpan_b.jpeg", "104"})
-	})
 
 
 }

@@ -252,7 +252,7 @@ func (c *siftClient)Match(ie1 *ImageEntity, ie2 *ImageEntity) bool {
 		wg.Add(1)
 		go func() {
 			features1 = loadFeatureData(ie1)
-			c.setCache(ie1, features1)
+			//c.setCache(ie1, features1)
 			wg.Done()
 		}()
 
